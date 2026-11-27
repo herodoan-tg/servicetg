@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OPPO Shop KPI & Sales Analytics Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- SheetJS (xlsx) for client-side Excel parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            oppo: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#047857',
+              700: '#065f46',
+              900: '#064e3b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+        <!-- Brand & Shop Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white font-extrabold text-lg shadow-sm">
+            OP
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 id="shopTitle" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+                OPPO Experience & Service Store Tiền Giang
+              </h1>
+              <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Live Dashboard
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-0.5">
+              <span class="flex items-center gap-1">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span id="currentFileName">Tiền Giang - Tổng Hợp Sale V1.4 - T11.xlsx</span>
+              </span>
+              <span>•</span>
+              <span class="flex items-center gap-1">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span id="lastUpdatedText">Dữ liệu mặc định (T11/2026)</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload & Storage Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="excelUploadInput" class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+            <span>Upload File Excel (.xlsx)</span>
+            <input id="excelUploadInput" type="file" accept=".xlsx,.xls" class="hidden" />
+          </label>
+
+          <button id="exportJsonBtn" title="Tải xuống file JSON để cập nhật dữ liệu mặc định lên GitHub" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-medium transition">
+            <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
+            <span class="hidden sm:inline">Xuất JSON</span>
+          </button>
+
+          <button id="resetStorageBtn" title="Khôi phục về dữ liệu gốc ban đầu" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-300 hover:border-rose-200 text-xs sm:text-sm font-medium transition">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Dữ liệu gốc</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex space-x-1 overflow-x-auto pt-1 pb-0 border-t border-slate-100" aria-label="Tabs">
+        <button data-tab="overview" class="tab-btn active px-4 py-2.5 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap flex items-center gap-1.5">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Tổng Quan KPI
+        </button>
+        <button data-tab="sales" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+          <i data-lucide="trending-up" class="w-4 h-4"></i> Doanh Số & Sản Phẩm
+        </button>
+        <button data-tab="staff" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+          <i data-lucide="users" class="w-4 h-4"></i> Năng Suất & Nhân Viên
+        </button>
+        <button data-tab="transactions" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+          <i data-lucide="table" class="w-4 h-4"></i> Chi Tiết Đơn Hàng
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Drag & Drop Overlay / Quick Upload Banner -->
+  <div id="dropZoneOverlay" class="fixed inset-0 z-50 bg-emerald-950/70 backdrop-blur-sm hidden flex-col items-center justify-center text-white p-6">
+    <div class="border-2 border-dashed border-emerald-300 rounded-2xl p-10 max-w-md w-full text-center bg-emerald-900/40">
+      <i data-lucide="file-up" class="w-14 h-14 mx-auto text-emerald-300 mb-3"></i>
+      <h3 class="text-xl font-bold">Thả file Excel vào đây</h3>
+      <p class="text-sm text-emerald-100 mt-1">Hỗ trợ file Tổng Hợp Sale (.xlsx, .xls). Dữ liệu sẽ tự động lưu vào trình duyệt!</p>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Storage Status Bar -->
+    <div id="storageBanner" class="bg-white rounded-xl border border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 shadow-sm">
+      <div class="flex items-center gap-2">
+        <span id="storageBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold bg-blue-50 text-blue-700">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i> Dữ liệu mặc định
+        </span>
+        <span>Kéo thả file Excel bất kỳ lúc nào vào trang web để cập nhật và tự động lưu trữ cho lần truy cập sau.</span>
+      </div>
+      <div class="font-medium text-slate-500" id="recordCountSummary">
+        210 đơn GCSM • 61 đơn Center SO
+      </div>
+    </div>
+
+    <!-- TAB 1: OVERVIEW KPI -->
+    <section id="tab-overview" class="tab-content space-y-6">
+      <!-- Top 4 Hero KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="heroKpiCards"></div>
+
+      <!-- Category Target vs Actual Progress Grid -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Tiến Độ Hoàn Thành Điểm Theo Nhóm Hàng</h2>
+            <p class="text-xs text-slate-500">So sánh Điểm thực tế đạt được so với Target tháng từng danh mục</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Đạt / Vượt Target (≥100%)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cận đích (80-99%)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Cần đẩy mạnh (<80%)</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="categoryProgressGrid"></div>
+      </div>
+
+      <!-- Charts Row: Target vs Actual Bar + KPI Report Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Bar Chart -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Biểu Đồ So Sánh Target & Thực Đạt</h3>
+          <p class="text-xs text-slate-500 mb-4">Điểm số quy đổi theo từng nhóm sản phẩm chủ lực</p>
+          <div class="relative flex-1 min-h-[290px]">
+            <canvas id="categoryBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- KPI Report Table -->
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Bảng Đánh Giá Chỉ Tiêu KPI Tháng</h3>
+            <p class="text-xs text-slate-500 mb-4">Theo dõi lũy kế các chỉ số trọng tâm của Brandshop</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="py-2 pr-2">Chỉ tiêu KPI</th>
+                    <th class="py-2 px-2 text-right">Lũy kế</th>
+                    <th class="py-2 px-2 text-right">Target</th>
+                    <th class="py-2 px-2 text-right">% Đạt</th>
+                    <th class="py-2 pl-2 text-center">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="kpiReportTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Service TAT & KL-DL Mini Strip -->
+          <div class="mt-5 pt-4 border-t border-slate-100 grid grid-cols-3 gap-2 text-center" id="serviceMiniStats"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SALES & PRODUCTS -->
+    <section id="tab-sales" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Daily Trend Chart -->
+        <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Xu Hướng Doanh Thu & Điểm Bán Theo Ngày</h3>
+              <p class="text-xs text-slate-500">Tổng hợp từ dữ liệu bán hàng thực tế Center SO & GCSM SO</p>
+            </div>
+          </div>
+          <div class="relative h-[310px]">
+            <canvas id="dailyTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Revenue / Points Share Doughnut -->
+        <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Cơ Cấu Điểm Đạt Được</h3>
+          <p class="text-xs text-slate-500 mb-4">Tỷ trọng đóng góp điểm theo danh mục</p>
+          <div class="relative flex-1 min-h-[250px] flex items-center justify-center">
+            <canvas id="categoryDoughnutChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Selling Models & Customer Mix -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Top Sản Phẩm / Model Bán Chạy Nhất</h3>
+          <p class="text-xs text-slate-500 mb-4">Xếp hạng theo số lượng xuất bán và điểm đóng góp</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                  <th class="py-2.5 pr-2">#</th>
+                  <th class="py-2.5 px-2">Tên sản phẩm / Model</th>
+                  <th class="py-2.5 px-2">Nhóm</th>
+                  <th class="py-2.5 px-2 text-right">Số lượng</th>
+                  <th class="py-2.5 px-2 text-right">Doanh thu</th>
+                  <th class="py-2.5 pl-2 text-right">Tổng điểm</th>
+                </tr>
+              </thead>
+              <tbody id="topProductsTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">Phân Bổ Khách Lẻ vs Đại Lý (KL - DL)</h3>
+            <p class="text-xs text-slate-500 mb-3">Tỷ trọng lượt phục vụ và tỷ lệ dán màn hình</p>
+            <div class="relative h-[180px]">
+              <canvas id="klDlChart"></canvas>
+            </div>
+          </div>
+          <div id="klDlDetailsBox" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/70 space-y-2 text-xs"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: STAFF PRODUCTIVITY -->
+    <section id="tab-staff" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Năng Suất Kỹ Thuật Viên (Service Volume)</h3>
+          <p class="text-xs text-slate-500 mb-4">Tổng hợp Volume sửa chữa, dịch vụ cộng thêm và phiếu SO</p>
+          <div class="relative h-[280px]">
+            <canvas id="staffProductivityChart"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Đóng Góp Doanh Số & Điểm Bán Hàng Theo Nhân Sự</h3>
+          <p class="text-xs text-slate-500 mb-4">Tổng hợp từ Center SO & GCSM SO theo người lên đơn / KPI</p>
+          <div class="relative h-[280px]">
+            <canvas id="staffSalesChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Productivity Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 mb-1">Bảng Chi Tiết Năng Suất Cá Nhân</h3>
+        <p class="text-xs text-slate-500 mb-4">Số liệu chi tiết từ bảng Năng Suất Cá Nhân trong báo cáo</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-50">
+                <th class="py-3 px-3">Mã KT</th>
+                <th class="py-3 px-3">Họ và Tên</th>
+                <th class="py-3 px-3">Khu vực</th>
+                <th class="py-3 px-3 text-right">Find Gập (*2)</th>
+                <th class="py-3 px-3 text-right">Máy thẳng</th>
+                <th class="py-3 px-3 text-right">Sửa chữa (*1)</th>
+                <th class="py-3 px-3 text-right">DV Cộng thêm (*0.5)</th>
+                <th class="py-3 px-3 text-right">SO Find N</th>
+                <th class="py-3 px-3 text-right">SO Thường</th>
+                <th class="py-3 px-3 text-right font-bold text-emerald-700">Tổng Volume</th>
+              </tr>
+            </thead>
+            <tbody id="staffTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: TRANSACTIONS EXPLORER -->
+    <section id="tab-transactions" class="tab-content hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Tra Cứu Chi Tiết Đơn Hàng</h3>
+            <p class="text-xs text-slate-500">Lọc nhanh theo nguồn dữ liệu, nhóm hàng, nhân viên hoặc tên sản phẩm</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="txSourceFilter" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="ALL">Tất cả nguồn (Center SO + GCSM SO)</option>
+              <option value="CENTER">Center SO (Bán máy & IoT)</option>
+              <option value="GCSM">GCSM SO (Service & Phụ kiện)</option>
+            </select>
+            <select id="txTypeFilter" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="ALL">Tất cả nhóm hàng</option>
+            </select>
+            <input id="txSearchInput" type="text" placeholder="Tìm mã đơn, sản phẩm, nhân viên..." class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs w-56 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-[540px]">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-slate-100 z-10">
+              <tr class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+                <th class="py-2.5 px-3">Nguồn</th>
+                <th class="py-2.5 px-3">Thời gian</th>
+                <th class="py-2.5 px-3">Mã đơn hàng</th>
+                <th class="py-2.5 px-3">Sản phẩm / Model</th>
+                <th class="py-2.5 px-3">Nhóm</th>
+                <th class="py-2.5 px-3">Nhân viên</th>
+                <th class="py-2.5 px-3 text-right">SL</th>
+                <th class="py-2.5 px-3 text-right">Doanh thu</th>
+                <th class="py-2.5 px-3 text-right">Điểm</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+          <span id="txPaginationInfo">Hiển thị 0 giao dịch</span>
+          <span>Dữ liệu được lưu cục bộ trên trình duyệt (LocalStorage)</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Load default data first, then app logic -->
+  <script src="data/default-data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
