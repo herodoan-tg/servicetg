@@ -1,13 +1,482 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OPPO Experience & Service Store - Báo Cáo Sale & KPI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-slate-50 text-slate-800 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BÁO CÁO KẾT QUẢ SALE & KPI - OPPO Experience & Service Store Tiền Giang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#046A38] text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/15 p-2.5 rounded-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-wide">BÁO CÁO KẾT QUẢ SALE & KPI</h1>
+          <p class="text-xs text-emerald-100">OPPO Experience & Service Store Tiền Giang</p>
+        </div>
+      </div>
+
+      <!-- Nút Upload Excel trực tiếp & Xuất Excel -->
+      <div class="flex items-center gap-3">
+        <label class="cursor-pointer bg-white text-[#046A38] hover:bg-emerald-50 font-semibold text-sm px-4 py-2 rounded-lg shadow flex items-center gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          <span>Tải lên file Excel</span>
+          <input type="file" id="excelUpload" accept=".xlsx,.xls" class="hidden" />
+        </label>
+
+        <button onclick="exportReport()" class="bg-[#0B874B] hover:bg-[#09733F] text-white font-semibold text-sm px-4 py-2 rounded-lg border border-white/20 flex items-center gap-2 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <span>Xuất Excel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 flex gap-6 text-sm font-medium border-t border-white/10">
+      <button onclick="switchTab('overview')" id="tab-overview" class="py-3 border-b-2 border-white text-white">Tổng hợp KPI</button>
+      <button onclick="switchTab('center')" id="tab-center" class="py-3 border-b-2 border-transparent text-emerald-100 hover:text-white">Center SO (<span id="count-center">0</span>)</button>
+      <button onclick="switchTab('gcsm')" id="tab-gcsm" class="py-3 border-b-2 border-transparent text-emerald-100 hover:text-white">GCSM SO (<span id="count-gcsm">0</span>)</button>
+      <button onclick="switchTab('rule')" id="tab-rule" class="py-3 border-b-2 border-transparent text-emerald-100 hover:text-white">Cấu hình Target & Rule</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Banner trạng thái dữ liệu -->
+    <div id="statusBanner" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xl flex items-center justify-between text-sm">
+      <div>
+        <span class="font-semibold" id="statusTitle">Đang tải dữ liệu...</span>
+        <p class="text-xs text-emerald-700 mt-0.5" id="statusDesc">Bạn có thể bấm "Tải lên file Excel" bất cứ lúc nào để cập nhật số liệu mới từ file Tổng Hợp Sale V1.4.</p>
+      </div>
+      <button onclick="resetToDefault()" class="text-xs underline text-emerald-800 hover:text-emerald-950 font-medium">Khôi phục mặc định</button>
+    </div>
+
+    <!-- TAB 1: TỔNG HỢP KPI -->
+    <section id="view-overview" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Card Tổng điểm -->
+        <div class="lg:col-span-2 bg-[#046A38] text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-emerald-200 font-semibold">TỔNG ĐIỂM HOÀN THÀNH KPI</p>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="totalScore" class="text-5xl font-extrabold">0</span>
+                <span class="text-lg text-emerald-200">/ <span id="totalTarget">176</span> điểm</span>
+              </div>
+            </div>
+            <div class="bg-white/15 px-4 py-2 rounded-xl text-right">
+              <p class="text-[11px] text-emerald-100">Tỷ lệ đạt</p>
+              <p id="totalPercent" class="text-2xl font-bold">0.0%</p>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <div class="w-full bg-black/25 h-2.5 rounded-full overflow-hidden">
+              <div id="totalProgress" class="bg-emerald-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-emerald-100">
+              <span id="remainingText">Còn thiếu: 176 điểm</span>
+              <span id="a7ProText">A7 Pro bán ra: 0 máy</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Trạng thái -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#046A38]"></span> Trạng thái các nhóm KPI
+            </h2>
+            <div class="mt-4 space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Nhóm đạt ≥ 100% chỉ tiêu</span>
+                <span id="achievedGroups" class="font-bold text-[#046A38]">0 / 8 nhóm</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Đơn Center SO hợp lệ</span>
+                <span id="validCenterRows" class="font-bold text-slate-800">0 dòng</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Đơn GCSM SO tính điểm</span>
+                <span id="validGcsmRows" class="font-bold text-slate-800">0 dòng</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="switchTab('rule')" class="mt-5 w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition">
+            ⚙ Chỉnh sửa Target / Bảng điểm Rule
+          </button>
+        </div>
+      </div>
+
+      <!-- 8 Nhóm KPI -->
+      <div id="kpiGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+      <!-- Biểu đồ so sánh -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-sm font-bold text-slate-800 mb-4">Biểu đồ so sánh Điểm Đạt Được và Chỉ Tiêu theo nhóm</h3>
+        <div class="h-72">
+          <canvas id="kpiChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: CENTER SO -->
+    <section id="view-center" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h2 class="font-bold text-sm">Danh sách đơn Center SO</h2>
+        <input type="text" id="searchCenter" onkeyup="renderTables()" placeholder="Tìm theo tên SP, khách hàng, người lên đơn..." class="text-xs border border-slate-300 rounded-lg px-3 py-1.5 w-64" />
+      </div>
+      <div class="overflow-x-auto max-h-[600px]">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-100 text-slate-600 sticky top-0">
+            <tr>
+              <th class="p-3">Ngày xuất</th>
+              <th class="p-3">Loại xuất</th>
+              <th class="p-3">Tên sản phẩm</th>
+              <th class="p-3">Người lên đơn</th>
+              <th class="p-3">Khách hàng</th>
+              <th class="p-3">Phân loại</th>
+              <th class="p-3 text-right">Điểm</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-center" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: GCSM SO -->
+    <section id="view-gcsm" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h2 class="font-bold text-sm">Danh sách đơn GCSM SO</h2>
+        <input type="text" id="searchGcsm" onkeyup="renderTables()" placeholder="Tìm theo mã SO, tên SP, KTV..." class="text-xs border border-slate-300 rounded-lg px-3 py-1.5 w-64" />
+      </div>
+      <div class="overflow-x-auto max-h-[600px]">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-100 text-slate-600 sticky top-0">
+            <tr>
+              <th class="p-3">Sales Order No.</th>
+              <th class="p-3">Thời gian</th>
+              <th class="p-3">KTV tạo đơn</th>
+              <th class="p-3">Tên sản phẩm</th>
+              <th class="p-3">Model máy</th>
+              <th class="p-3">Type</th>
+              <th class="p-3 text-right">Điểm</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-gcsm" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: RULE -->
+    <section id="view-rule" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-200">
+        <h2 class="font-bold text-sm">Bảng quy đổi điểm theo Model (Sheet Rule)</h2>
+      </div>
+      <div class="overflow-x-auto max-h-[600px]">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-100 text-slate-600 sticky top-0">
+            <tr>
+              <th class="p-3">#</th>
+              <th class="p-3">Model</th>
+              <th class="p-3">Nhóm KPI (Type)</th>
+              <th class="p-3 text-right">Điểm quy đổi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-rule" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DEFAULT_TARGETS = {
+      'PHONE': 68, 'TAI NGHE': 6, 'PAD': 4, 'ỐP LƯNG': 9,
+      'OPPO CARE': 20, 'MDCL': 64, 'SẠC DỰ PHÒNG': 6, 'WATCH': 0
+    };
+
+    const LABELS = {
+      'PHONE': 'PHONE', 'TAI NGHE': 'TAI NGHE', 'PAD': 'PAD', 'ỐP LƯNG': 'ỐP LƯNG',
+      'OPPO CARE': 'OPPO CARE', 'MDCL': 'MDCL (DÁN CÓ PHÍ)', 'SẠC DỰ PHÒNG': 'SẠC DỰ PHÒNG', 'WATCH': 'WATCH'
+    };
+
+    let appState = {
+      targets: { ...DEFAULT_TARGETS },
+      centerRows: [],
+      gcsmRows: [],
+      rules: [],
+      sourceName: 'Dữ liệu mặc định (T11/2026)'
+    };
+
+    let chartInstance = null;
+
+    function normalizeType(raw) {
+      if (!raw) return '';
+      const s = String(raw).trim().toUpperCase();
+      if (s.includes('MIẾNG DÁN') || s === 'MDCL') return 'MDCL';
+      if (s.includes('CARE')) return 'OPPO CARE';
+      if (s.includes('SẠC')) return 'SẠC DỰ PHÒNG';
+      if (s.includes('ỐP')) return 'ỐP LƯNG';
+      if (s.includes('TAI NGHE')) return 'TAI NGHE';
+      if (s.includes('PAD')) return 'PAD';
+      if (s.includes('WATCH')) return 'WATCH';
+      if (s.includes('PHONE')) return 'PHONE';
+      return s;
+    }
+
+    document.getElementById('excelUpload').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        if (workbook.Sheets['Tổng hợp']) {
+          const th = XLSX.utils.sheet_to_json(workbook.Sheets['Tổng hợp'], { header: 1 });
+          if (th[2]) {
+            appState.targets = {
+              'PHONE': Number(th[2][4]) || 68,
+              'TAI NGHE': Number(th[2][7]) || 6,
+              'PAD': Number(th[2][10]) || 4,
+              'ỐP LƯNG': Number(th[2][13]) || 9,
+              'OPPO CARE': Number(th[2][16]) || 20,
+              'MDCL': Number(th[2][19]) || 64,
+              'SẠC DỰ PHÒNG': Number(th[2][22]) || 6,
+              'WATCH': Number(th[2][26]) || 0
+            };
+          }
+        }
+
+        if (workbook.Sheets['Center SO']) {
+          const rawCenter = XLSX.utils.sheet_to_json(workbook.Sheets['Center SO'], { range: 2 });
+          appState.centerRows = rawCenter
+            .filter(r => r['Loại xuất'] === 'Xuất bán' && r['Trạng thái'] === 'Hiệu lực')
+            .map(r => ({
+              date: r['Ngày xuất bán'] || '',
+              exportType: r['Loại xuất'] || '',
+              product: r['Tên sản phẩm'] || r['Model'] || '',
+              staff: r['Người lên đơn'] || '',
+              customer: r['Tên khách hàng'] || '',
+              type: normalizeType(r['Type']),
+              score: Number(r['Điểm']) || 0
+            }));
+        }
+
+        if (workbook.Sheets['GCSM SO']) {
+          const rawGcsm = XLSX.utils.sheet_to_json(workbook.Sheets['GCSM SO']);
+          appState.gcsmRows = rawGcsm
+            .filter(r => (Number(r['Điểm']) || 0) > 0 || r['Type'])
+            .map(r => ({
+              so: r['Sales order No.'] || '',
+              time: r['Sales time'] || r['Created on'] || '',
+              staff: r['Created by'] || '',
+              product: r['Sales Product Name'] || '',
+              model: r['Marketing model'] || '',
+              type: normalizeType(r['Type']),
+              score: Number(r['Điểm']) || 0
+            }));
+        }
+
+        if (workbook.Sheets['Rule']) {
+          const rawRule = XLSX.utils.sheet_to_json(workbook.Sheets['Rule']);
+          appState.rules = rawRule.map(r => ({
+            model: r['Model'] || '',
+            score: Number(r['Điểm tổng kết']) || 0,
+            type: normalizeType(r['Type'])
+          }));
+        }
+
+        appState.sourceName = `File tải lên: ${file.name} (${new Date().toLocaleTimeString('vi-VN')})`;
+        localStorage.setItem('oppo_tg_kpi_data', JSON.stringify(appState));
+        renderDashboard();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    function renderDashboard() {
+      const scores = {
+        'PHONE': 0, 'TAI NGHE': 0, 'PAD': 0, 'ỐP LƯNG': 0,
+        'OPPO CARE': 0, 'MDCL': 0, 'SẠC DỰ PHÒNG': 0, 'WATCH': 0
+      };
+      let a7ProCount = 0;
+
+      appState.centerRows.forEach(r => {
+        if (scores.hasOwnProperty(r.type)) scores[r.type] += r.score;
+        if (String(r.product).toUpperCase().includes('A7 PRO')) a7ProCount += 1;
+      });
+
+      appState.gcsmRows.forEach(r => {
+        if (scores.hasOwnProperty(r.type)) scores[r.type] += r.score;
+      });
+
+      const totalTarget = Object.values(appState.targets).reduce((a, b) => a + b, 0) - (appState.targets['WATCH'] || 0);
+      const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+      const pct = totalTarget > 0 ? ((totalScore / totalTarget) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('statusTitle').textContent = appState.sourceName;
+      document.getElementById('totalScore').textContent = totalScore;
+      document.getElementById('totalTarget').textContent = totalTarget || 176;
+      document.getElementById('totalPercent').textContent = `${pct}%`;
+      document.getElementById('totalProgress').style.width = `${Math.min(100, Number(pct))}%`;
+      document.getElementById('remainingText').textContent = totalScore >= totalTarget
+        ? `Vượt chỉ tiêu: +${totalScore - totalTarget} điểm`
+        : `Còn thiếu: ${totalTarget - totalScore} điểm`;
+      document.getElementById('a7ProText').textContent = `A7 Pro bán ra: ${a7ProCount} máy`;
+
+      document.getElementById('count-center').textContent = appState.centerRows.length;
+      document.getElementById('count-gcsm').textContent = appState.gcsmRows.length;
+      document.getElementById('validCenterRows').textContent = `${appState.centerRows.length} dòng`;
+      document.getElementById('validGcsmRows').textContent = `${appState.gcsmRows.filter(x => x.score > 0).length} dòng`;
+
+      const grid = document.getElementById('kpiGrid');
+      grid.innerHTML = '';
+      let achieved = 0;
+
+      Object.keys(LABELS).forEach(key => {
+        const sc = scores[key] || 0;
+        const tg = appState.targets[key] || 0;
+        const itemPct = tg > 0 ? ((sc / tg) * 100).toFixed(1) : (sc > 0 ? '100.0' : '0.0');
+        if (tg > 0 && sc >= tg) achieved++;
+
+        grid.innerHTML += `
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-xs font-bold text-slate-500">${LABELS[key]}</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${Number(itemPct) >= 100 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${itemPct}%</span>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-extrabold text-slate-800">${sc}</span>
+              <span class="text-xs text-slate-400">/ ${tg} điểm</span>
+            </div>
+            <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-[#046A38] h-full rounded-full" style="width: ${Math.min(100, Number(itemPct))}%"></div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('achievedGroups').textContent = `${achieved} / 8 nhóm`;
+      renderChart(scores);
+      renderTables();
+    }
+
+    function renderChart(scores) {
+      const ctx = document.getElementById('kpiChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const keys = Object.keys(LABELS);
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: keys.map(k => LABELS[k]),
+          datasets: [
+            { label: 'Điểm đạt được', data: keys.map(k => scores[k] || 0), backgroundColor: '#046A38', borderRadius: 6 },
+            { label: 'Chỉ tiêu (Target)', data: keys.map(k => appState.targets[k] || 0), backgroundColor: '#CBD5E1', borderRadius: 6 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+      });
+    }
+
+    function renderTables() {
+      const qCenter = (document.getElementById('searchCenter')?.value || '').toLowerCase();
+      document.getElementById('tbody-center').innerHTML = appState.centerRows
+        .filter(r => `${r.product} ${r.customer} ${r.staff}`.toLowerCase().includes(qCenter))
+        .map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 whitespace-nowrap">${r.date}</td>
+            <td class="p-3">${r.exportType}</td>
+            <td class="p-3 font-medium">${r.product}</td>
+            <td class="p-3">${r.staff}</td>
+            <td class="p-3">${r.customer}</td>
+            <td class="p-3"><span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded">${r.type}</span></td>
+            <td class="p-3 text-right font-bold">${r.score}</td>
+          </tr>
+        `).join('');
+
+      const qGcsm = (document.getElementById('searchGcsm')?.value || '').toLowerCase();
+      document.getElementById('tbody-gcsm').innerHTML = appState.gcsmRows
+        .filter(r => `${r.so} ${r.product} ${r.staff} ${r.model}`.toLowerCase().includes(qGcsm))
+        .map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono">${r.so}</td>
+            <td class="p-3 whitespace-nowrap">${r.time}</td>
+            <td class="p-3">${r.staff}</td>
+            <td class="p-3 font-medium">${r.product}</td>
+            <td class="p-3">${r.model}</td>
+            <td class="p-3"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded">${r.type}</span></td>
+            <td class="p-3 text-right font-bold">${r.score}</td>
+          </tr>
+        `).join('');
+
+      document.getElementById('tbody-rule').innerHTML = appState.rules
+        .map((r, i) => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 text-slate-400">${i + 1}</td>
+            <td class="p-3 font-medium">${r.model}</td>
+            <td class="p-3">${r.type}</td>
+            <td class="p-3 text-right font-bold">${r.score}</td>
+          </tr>
+        `).join('');
+    }
+
+    function switchTab(tab) {
+      ['overview', 'center', 'gcsm', 'rule'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`tab-${t}`);
+        btn.classList.toggle('border-white', t === tab);
+        btn.classList.toggle('text-white', t === tab);
+        btn.classList.toggle('border-transparent', t !== tab);
+        btn.classList.toggle('text-emerald-100', t !== tab);
+      });
+    }
+
+    function exportReport() {
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.centerRows), 'Center_SO_Filtered');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.gcsmRows), 'GCSM_SO_Filtered');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appState.rules), 'Rule');
+      XLSX.writeFile(wb, 'Bao_Cao_KPI_Tien_Giang.xlsx');
+    }
+
+    async function loadInitialData() {
+      const cached = localStorage.getItem('oppo_tg_kpi_data');
+      if (cached) {
+        appState = JSON.parse(cached);
+        renderDashboard();
+        return;
+      }
+      await resetToDefault();
+    }
+
+    async function resetToDefault() {
+      localStorage.removeItem('oppo_tg_kpi_data');
+      try {
+        const res = await fetch('./data.json');
+        if (res.ok) {
+          appState = await res.json();
+        }
+      } catch (err) {
+        console.log('Chưa có data.json mặc định.');
+      }
+      renderDashboard();
+    }
+
+    loadInitialData();
+  </script>
+</body>
 </html>
