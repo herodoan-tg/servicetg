@@ -1,0 +1,505 @@
+{
+  "metadata": {
+    "store_name": "OPPO Experience & Service Store Tiền Giang",
+    "address": "Lầu 4, Tòa nhà ACB, 139 Nam Kì Khởi Nghĩa, Phường Đạo Thạnh, Tỉnh Đồng Tháp",
+    "region": "Khu vực Miền Tây - Tiền Giang",
+    "reporting_period": "Tháng 11/2026",
+    "last_updated": "2026-11-28T08:30:00+07:00",
+    "uploaded_by": "Dữ liệu mặc định hệ thống (GitHub)",
+    "source_filename": "OPPO_Store_KPI_Data.xlsx",
+    "currency": "VND"
+  },
+  "kpi_summary": [
+    {
+      "category": "Phone",
+      "target_qty": 18,
+      "actual_qty": 17,
+      "completion_pct": 94.4,
+      "target_points": 150.0,
+      "actual_points": 140.0,
+      "revenue_vnd": 219830000
+    },
+    {
+      "category": "Tai nghe",
+      "target_qty": 20,
+      "actual_qty": 22,
+      "completion_pct": 110.0,
+      "target_points": 40.0,
+      "actual_points": 43.0,
+      "revenue_vnd": 23180000
+    },
+    {
+      "category": "Pad",
+      "target_qty": 4,
+      "actual_qty": 3,
+      "completion_pct": 75.0,
+      "target_points": 28.0,
+      "actual_points": 21.0,
+      "revenue_vnd": 32970000
+    },
+    {
+      "category": "Oppo Care",
+      "target_qty": 10,
+      "actual_qty": 9,
+      "completion_pct": 90.0,
+      "target_points": 40.0,
+      "actual_points": 36.0,
+      "revenue_vnd": 11610000
+    },
+    {
+      "category": "MDCL",
+      "target_qty": 25,
+      "actual_qty": 28,
+      "completion_pct": 112.0,
+      "target_points": 25.0,
+      "actual_points": 28.0,
+      "revenue_vnd": 7000000
+    }
+  ],
+  "service_metrics": {
+    "total_service_orders": 8,
+    "completed_orders": 7,
+    "pending_orders": 1,
+    "avg_tat_minutes": 42.3,
+    "tat_under_1h_pct": 87.5,
+    "nps_score": 94.8,
+    "promoters_pct": 94.8,
+    "passives_pct": 5.2,
+    "detractors_pct": 0.0,
+    "total_service_points": 22.0
+  },
+  "customer_segment": [
+    {
+      "segment": "Khách lẻ",
+      "so_count": 14,
+      "share_pct": 82.4,
+      "revenue_vnd": 226670000,
+      "points": 244.5
+    },
+    {
+      "segment": "Đại lý",
+      "so_count": 3,
+      "share_pct": 17.6,
+      "revenue_vnd": 67920000,
+      "points": 45.5
+    }
+  ],
+  "staff_performance": [
+    {
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An",
+      "role": "Kỹ thuật viên & Tư vấn",
+      "sales_points": 117.0,
+      "service_points": 7.5,
+      "total_points": 124.5,
+      "target_points": 120.0,
+      "kpi_pct": 103.8,
+      "avg_tat_min": 35.0,
+      "nps_score": 96.7,
+      "revenue_vnd": 136540000,
+      "orders_count": 7
+    },
+    {
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình",
+      "role": "Kỹ thuật viên & Tư vấn",
+      "sales_points": 93.0,
+      "service_points": 9.0,
+      "total_points": 102.0,
+      "target_points": 105.0,
+      "kpi_pct": 97.1,
+      "avg_tat_min": 46.0,
+      "nps_score": 94.5,
+      "revenue_vnd": 81850000,
+      "orders_count": 6
+    },
+    {
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường",
+      "role": "Kỹ thuật viên",
+      "sales_points": 58.0,
+      "service_points": 5.5,
+      "total_points": 63.5,
+      "target_points": 75.0,
+      "kpi_pct": 84.7,
+      "avg_tat_min": 52.5,
+      "nps_score": 91.0,
+      "revenue_vnd": 76200000,
+      "orders_count": 5
+    }
+  ],
+  "kpi_detailed_report": [
+    {
+      "week": "Tuần 1 (01-07/11)",
+      "sales_revenue_vnd": 173850000,
+      "sales_points": 110.0,
+      "service_points": 7.5,
+      "avg_tat_min": 37.0,
+      "nps": 96.0
+    },
+    {
+      "week": "Tuần 2 (08-14/11)",
+      "sales_revenue_vnd": 56150000,
+      "sales_points": 64.0,
+      "service_points": 5.5,
+      "avg_tat_min": 57.5,
+      "nps": 92.5
+    },
+    {
+      "week": "Tuần 3 (15-21/11)",
+      "sales_revenue_vnd": 18610000,
+      "sales_points": 64.0,
+      "service_points": 3.5,
+      "avg_tat_min": 42.0,
+      "nps": 95.0
+    },
+    {
+      "week": "Tuần 4 (22-28/11)",
+      "sales_revenue_vnd": 45980000,
+      "sales_points": 30.0,
+      "service_points": 5.5,
+      "avg_tat_min": 40.0,
+      "nps": 95.5
+    }
+  ],
+  "approval_queue": [
+    {
+      "queue_id": "APR-001",
+      "ref_so": "GCSM-2611-008",
+      "type": "Điểm dịch vụ ngoài BH",
+      "staff_name": "Trần Thị Bình",
+      "points": 3.5,
+      "submitted_date": "2026-11-26",
+      "status": "Pending",
+      "note": "Thay màn hình OPPO Reno 15 ngoài bảo hành"
+    },
+    {
+      "queue_id": "APR-002",
+      "ref_so": "CSO-2611-109",
+      "type": "Phiếu luân chuyển kho",
+      "staff_name": "Lê Hoàng Cường",
+      "points": 0.0,
+      "submitted_date": "2026-11-21",
+      "status": "Approved",
+      "note": "Điều chuyển 4 máy Reno 15 sang chi nhánh khu vực"
+    }
+  ],
+  "rules": [
+    {
+      "model": "OPPO Find X9s",
+      "category": "Phone",
+      "points_per_unit": 15.0,
+      "unit_price_vnd": 22990000,
+      "segment": "Flagship"
+    },
+    {
+      "model": "OPPO Reno 15",
+      "category": "Phone",
+      "points_per_unit": 8.0,
+      "unit_price_vnd": 11990000,
+      "segment": "Mid-High"
+    },
+    {
+      "model": "OPPO Reno14F",
+      "category": "Phone",
+      "points_per_unit": 5.0,
+      "unit_price_vnd": 8490000,
+      "segment": "Mid"
+    },
+    {
+      "model": "OPPO Pad 3",
+      "category": "Pad",
+      "points_per_unit": 7.0,
+      "unit_price_vnd": 10990000,
+      "segment": "Tablet"
+    },
+    {
+      "model": "OPPO Enco Air5s",
+      "category": "Tai nghe",
+      "points_per_unit": 2.5,
+      "unit_price_vnd": 1490000,
+      "segment": "IoT"
+    },
+    {
+      "model": "OPPO Enco Buds2",
+      "category": "Tai nghe",
+      "points_per_unit": 1.5,
+      "unit_price_vnd": 690000,
+      "segment": "IoT"
+    },
+    {
+      "model": "OPPO Care+ 12M",
+      "category": "Oppo Care",
+      "points_per_unit": 4.0,
+      "unit_price_vnd": 1290000,
+      "segment": "Service"
+    },
+    {
+      "model": "MDCL Cường lực UV/Film",
+      "category": "MDCL",
+      "points_per_unit": 1.0,
+      "unit_price_vnd": 250000,
+      "segment": "Accessory"
+    },
+    {
+      "model": "Dịch vụ Sửa chữa Ngoài BH",
+      "category": "Service",
+      "points_per_unit": 3.5,
+      "unit_price_vnd": 1500000,
+      "segment": "After-Sales"
+    },
+    {
+      "model": "Dịch vụ Bảo hành Tiêu chuẩn",
+      "category": "Service",
+      "points_per_unit": 2.0,
+      "unit_price_vnd": 0,
+      "segment": "After-Sales"
+    }
+  ],
+  "gcsm_so": [
+    {
+      "so_id": "GCSM-2611-001",
+      "date": "2026-11-02",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Find X9s",
+      "service_type": "Dịch vụ Bảo hành Tiêu chuẩn",
+      "tat_minutes": 35,
+      "tat_sla_met": true,
+      "nps_score": 10,
+      "points": 2.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-002",
+      "date": "2026-11-04",
+      "customer_type": "Đại lý",
+      "model": "OPPO Reno14F",
+      "service_type": "Dịch vụ Sửa chữa Ngoài BH",
+      "tat_minutes": 48,
+      "tat_sla_met": true,
+      "nps_score": 9,
+      "points": 3.5,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-003",
+      "date": "2026-11-07",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Reno 15",
+      "service_type": "Dịch vụ Bảo hành Tiêu chuẩn",
+      "tat_minutes": 28,
+      "tat_sla_met": true,
+      "nps_score": 10,
+      "points": 2.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-004",
+      "date": "2026-11-10",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Pad 3",
+      "service_type": "Dịch vụ Sửa chữa Ngoài BH",
+      "tat_minutes": 75,
+      "tat_sla_met": false,
+      "nps_score": 8,
+      "points": 3.5,
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-005",
+      "date": "2026-11-14",
+      "customer_type": "Đại lý",
+      "model": "OPPO Reno 15",
+      "service_type": "Dịch vụ Bảo hành Tiêu chuẩn",
+      "tat_minutes": 40,
+      "tat_sla_met": true,
+      "nps_score": 10,
+      "points": 2.0,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-006",
+      "date": "2026-11-18",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Find X9s",
+      "service_type": "Dịch vụ Sửa chữa Ngoài BH",
+      "tat_minutes": 42,
+      "tat_sla_met": true,
+      "nps_score": 10,
+      "points": 3.5,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-007",
+      "date": "2026-11-22",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Reno14F",
+      "service_type": "Dịch vụ Bảo hành Tiêu chuẩn",
+      "tat_minutes": 30,
+      "tat_sla_met": true,
+      "nps_score": 9,
+      "points": 2.0,
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường",
+      "status": "Completed"
+    },
+    {
+      "so_id": "GCSM-2611-008",
+      "date": "2026-11-26",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Reno 15",
+      "service_type": "Dịch vụ Sửa chữa Ngoài BH",
+      "tat_minutes": 50,
+      "tat_sla_met": true,
+      "nps_score": 10,
+      "points": 3.5,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình",
+      "status": "Pending Approval"
+    }
+  ],
+  "center_so": [
+    {
+      "so_id": "CSO-2611-101",
+      "date": "2026-11-01",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Find X9s",
+      "category": "Phone",
+      "qty": 2,
+      "revenue_vnd": 45980000,
+      "points": 30.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An"
+    },
+    {
+      "so_id": "CSO-2611-102",
+      "date": "2026-11-03",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Reno 15",
+      "category": "Phone",
+      "qty": 5,
+      "revenue_vnd": 59950000,
+      "points": 40.0,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình"
+    },
+    {
+      "so_id": "CSO-2611-103",
+      "date": "2026-11-05",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Đại lý",
+      "model": "OPPO Reno14F",
+      "category": "Phone",
+      "qty": 8,
+      "revenue_vnd": 67920000,
+      "points": 40.0,
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường"
+    },
+    {
+      "so_id": "CSO-2611-104",
+      "date": "2026-11-08",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Pad 3",
+      "category": "Pad",
+      "qty": 3,
+      "revenue_vnd": 32970000,
+      "points": 21.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An"
+    },
+    {
+      "so_id": "CSO-2611-105",
+      "date": "2026-11-11",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Enco Air5s",
+      "category": "Tai nghe",
+      "qty": 10,
+      "revenue_vnd": 14900000,
+      "points": 25.0,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình"
+    },
+    {
+      "so_id": "CSO-2611-106",
+      "date": "2026-11-13",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Enco Buds2",
+      "category": "Tai nghe",
+      "qty": 12,
+      "revenue_vnd": 8280000,
+      "points": 18.0,
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường"
+    },
+    {
+      "so_id": "CSO-2611-107",
+      "date": "2026-11-16",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Care+ 12M",
+      "category": "Oppo Care",
+      "qty": 9,
+      "revenue_vnd": 11610000,
+      "points": 36.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An"
+    },
+    {
+      "so_id": "CSO-2611-108",
+      "date": "2026-11-19",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "MDCL Cường lực UV/Film",
+      "category": "MDCL",
+      "qty": 28,
+      "revenue_vnd": 7000000,
+      "points": 28.0,
+      "staff_id": "NV02",
+      "staff_name": "Trần Thị Bình"
+    },
+    {
+      "so_id": "CSO-2611-109",
+      "date": "2026-11-21",
+      "transaction_type": "Luân chuyển",
+      "customer_type": "Nội bộ",
+      "model": "OPPO Reno 15",
+      "category": "Phone",
+      "qty": 4,
+      "revenue_vnd": 0,
+      "points": 0.0,
+      "staff_id": "NV03",
+      "staff_name": "Lê Hoàng Cường"
+    },
+    {
+      "so_id": "CSO-2611-110",
+      "date": "2026-11-25",
+      "transaction_type": "Xuất bán",
+      "customer_type": "Khách lẻ",
+      "model": "OPPO Find X9s",
+      "category": "Phone",
+      "qty": 2,
+      "revenue_vnd": 45980000,
+      "points": 30.0,
+      "staff_id": "NV01",
+      "staff_name": "Nguyễn Văn An"
+    }
+  ]
+}
