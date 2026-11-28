@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <!-- SheetJS (xlsx) for client-side Excel parsing -->
+  <!-- SheetJS (xlsx) for client-side Excel parsing & export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -71,20 +71,53 @@
           </div>
         </div>
 
-        <!-- Upload & Storage Controls -->
+        <!-- Upload, Target & Export Controls -->
         <div class="flex flex-wrap items-center gap-2">
-          <label for="excelUploadInput" class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+          <!-- Nút mở khu vực Upload Dữ Liệu (Tổng hợp / GCSM / Center) -->
+          <button id="openUploadModalBtn" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
             <i data-lucide="upload-cloud" class="w-4 h-4"></i>
-            <span>Upload File Excel (.xlsx)</span>
-            <input id="excelUploadInput" type="file" accept=".xlsx,.xls" class="hidden" />
-          </label>
-
-          <button id="exportJsonBtn" title="Tải xuống file JSON để cập nhật dữ liệu mặc định lên GitHub" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-medium transition">
-            <i data-lucide="download" class="w-4 h-4 text-slate-500"></i>
-            <span class="hidden sm:inline">Xuất JSON</span>
+            <span>Upload Dữ Liệu</span>
           </button>
 
-          <button id="resetStorageBtn" title="Khôi phục về dữ liệu gốc ban đầu" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-300 hover:border-rose-200 text-xs sm:text-sm font-medium transition">
+          <!-- Nút Thay Đổi Target -->
+          <button id="openTargetModalBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs sm:text-sm font-semibold transition">
+            <i data-lucide="target" class="w-4 h-4 text-amber-600"></i>
+            <span>Cài đặt Target</span>
+          </button>
+
+          <!-- Dropdown Export Báo Cáo -->
+          <div class="relative" id="exportDropdownWrapper">
+            <button id="exportMenuBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              <i data-lucide="file-down" class="w-4 h-4"></i>
+              <span>Export Báo Cáo</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+            </button>
+            <div id="exportDropdownMenu" class="hidden absolute right-0 mt-1.5 w-60 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-40 text-xs">
+              <button id="exportExcelReportBtn" type="button" class="w-full px-3.5 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-medium">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i>
+                <div>
+                  <div class="font-semibold text-slate-900">Xuất Báo Cáo Excel (.xlsx)</div>
+                  <div class="text-[11px] text-slate-400">Tổng hợp KPI, Target, Nhân sự & Đơn hàng</div>
+                </div>
+              </button>
+              <button id="exportPrintReportBtn" type="button" class="w-full px-3.5 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-medium border-t border-slate-100">
+                <i data-lucide="printer" class="w-4 h-4 text-blue-600"></i>
+                <div>
+                  <div class="font-semibold text-slate-900">In / Lưu Báo Cáo PDF</div>
+                  <div class="text-[11px] text-slate-400">Xuất bản in hoặc PDF gửi quản lý</div>
+                </div>
+              </button>
+              <button id="exportJsonBtn" type="button" class="w-full px-3.5 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2.5 text-slate-700 font-medium border-t border-slate-100">
+                <i data-lucide="code-2" class="w-4 h-4 text-slate-500"></i>
+                <div>
+                  <div class="font-semibold text-slate-900">Xuất Dữ Liệu JSON</div>
+                  <div class="text-[11px] text-slate-400">Lưu cấu hình cập nhật lên GitHub</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <button id="resetStorageBtn" type="button" title="Khôi phục về dữ liệu gốc ban đầu" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-300 hover:border-rose-200 text-xs sm:text-sm font-medium transition">
             <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Dữ liệu gốc</span>
           </button>
@@ -109,12 +142,138 @@
     </div>
   </header>
 
-  <!-- Drag & Drop Overlay / Quick Upload Banner -->
+  <!-- Drag & Drop Overlay -->
   <div id="dropZoneOverlay" class="fixed inset-0 z-50 bg-emerald-950/70 backdrop-blur-sm hidden flex-col items-center justify-center text-white p-6">
     <div class="border-2 border-dashed border-emerald-300 rounded-2xl p-10 max-w-md w-full text-center bg-emerald-900/40">
       <i data-lucide="file-up" class="w-14 h-14 mx-auto text-emerald-300 mb-3"></i>
       <h3 class="text-xl font-bold">Thả file Excel vào đây</h3>
       <p class="text-sm text-emerald-100 mt-1">Hỗ trợ file Tổng Hợp Sale (.xlsx, .xls). Dữ liệu sẽ tự động lưu vào trình duyệt!</p>
+    </div>
+  </div>
+
+  <!-- MODAL 1: UPLOAD DỮ LIỆU (TỔNG HỢP / GCSM / CENTER) -->
+  <div id="uploadModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Cập Nhật Dữ Liệu Bán Hàng & Dịch Vụ</h3>
+            <p class="text-xs text-slate-500">Chọn tải lên file Tổng Hợp hoặc tải riêng từng nguồn GCSM / Center</p>
+          </div>
+        </div>
+        <button id="closeUploadModalBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5">
+        <!-- Lựa chọn 1: File Tổng Hợp -->
+        <div class="p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 transition">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white mb-1">KHUYẾN NGHỊ</span>
+              <h4 class="text-sm font-bold text-slate-900">1. Upload File Tổng Hợp Sale (.xlsx)</h4>
+              <p class="text-xs text-slate-600 mt-0.5">Tự động đọc toàn bộ các sheet (KPI, Center SO, GCSM SO, Năng suất...)</p>
+            </div>
+            <label for="excelUploadInput" class="cursor-pointer shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+              <span>Chọn File Tổng Hợp</span>
+              <input id="excelUploadInput" type="file" accept=".xlsx,.xls" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Lựa chọn 2: Upload riêng GCSM & Center -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">2. Hoặc Upload Tách Riêng Từng Nguồn (GCSM & Center)</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Upload GCSM -->
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:border-blue-400 transition flex flex-col justify-between gap-3">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <i data-lucide="wrench" class="w-4 h-4 text-blue-600"></i> Dữ liệu GCSM
+                  </span>
+                  <span id="gcsmFileStatus" class="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-200 text-slate-600">Chưa chọn</span>
+                </div>
+                <p class="text-xs text-slate-500">File xuất từ hệ thống GCSM (Service SO, sửa chữa, phụ kiện, dán màn hình).</p>
+              </div>
+              <label for="gcsmUploadInput" class="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white hover:bg-blue-50 text-blue-700 border border-blue-300 text-xs font-semibold transition">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span>Tải lên file GCSM (.xlsx)</span>
+                <input id="gcsmUploadInput" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+              </label>
+            </div>
+
+            <!-- Upload Center -->
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:border-purple-400 transition flex flex-col justify-between gap-3">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-purple-600"></i> Dữ liệu Center
+                  </span>
+                  <span id="centerFileStatus" class="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-200 text-slate-600">Chưa chọn</span>
+                </div>
+                <p class="text-xs text-slate-500">File xuất từ Center SO (Doanh số bán máy Phone, Pad, Watch, IoT).</p>
+              </div>
+              <label for="centerUploadInput" class="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 text-xs font-semibold transition">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span>Tải lên file Center (.xlsx)</span>
+                <input id="centerUploadInput" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <span>Dữ liệu sau khi tải lên sẽ tự động đồng bộ vào Dashboard</span>
+        <button id="doneUploadModalBtn" type="button" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-semibold">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CÀI ĐẶT / THAY ĐỔI TARGET -->
+  <div id="targetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-amber-50/70 border-b border-amber-200/70 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+            <i data-lucide="target" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Thiết Lập & Thay Đổi Target Tháng</h3>
+            <p class="text-xs text-slate-600">Điều chỉnh chỉ tiêu điểm từng nhóm hàng, hệ thống tự động tính lại % hoàn thành</p>
+          </div>
+        </div>
+        <button id="closeTargetModalBtn" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="targetForm" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="targetInputsGrid">
+          <!-- Tự động render từ danh mục hoặc fallback mặc định -->
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-700">Tổng Target Điểm Toàn Cửa Hàng:</span>
+          <span id="totalTargetPreview" class="text-base font-extrabold text-emerald-700">176 điểm</span>
+        </div>
+      </form>
+
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <button id="resetDefaultTargetBtn" type="button" class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition">
+          Khôi phục Target mặc định
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="cancelTargetModalBtn" type="button" class="px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-700">Hủy</button>
+          <button id="saveTargetBtn" type="button" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm">Lưu Target Mới</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -124,13 +283,13 @@
   <!-- Main Content Area -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- Storage Status Bar -->
+    <!-- Storage Status & Quick Action Bar -->
     <div id="storageBanner" class="bg-white rounded-xl border border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 shadow-sm">
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <span id="storageBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold bg-blue-50 text-blue-700">
           <i data-lucide="database" class="w-3.5 h-3.5"></i> Dữ liệu mặc định
         </span>
-        <span>Kéo thả file Excel bất kỳ lúc nào vào trang web để cập nhật và tự động lưu trữ cho lần truy cập sau.</span>
+        <span>Hỗ trợ upload file Tổng Hợp, riêng lẻ <strong>GCSM / Center</strong>, chỉnh <strong>Target</strong> trực tiếp và <strong>Export báo cáo</strong>.</span>
       </div>
       <div class="font-medium text-slate-500" id="recordCountSummary">
         210 đơn GCSM • 61 đơn Center SO
@@ -146,7 +305,12 @@
       <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 class="text-base font-bold text-slate-900">Tiến Độ Hoàn Thành Điểm Theo Nhóm Hàng</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900">Tiến Độ Hoàn Thành Điểm Theo Nhóm Hàng</h2>
+              <button type="button" onclick="document.getElementById('openTargetModalBtn').click()" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[11px] font-semibold transition">
+                <i data-lucide="pencil" class="w-3 h-3"></i> Sửa Target
+              </button>
+            </div>
             <p class="text-xs text-slate-500">So sánh Điểm thực tế đạt được so với Target tháng từng danh mục</p>
           </div>
           <div class="flex items-center gap-3 text-xs">
@@ -172,7 +336,12 @@
         <!-- KPI Report Table -->
         <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 class="text-base font-bold text-slate-900 mb-1">Bảng Đánh Giá Chỉ Tiêu KPI Tháng</h3>
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="text-base font-bold text-slate-900">Bảng Đánh Giá Chỉ Tiêu KPI Tháng</h3>
+              <button type="button" id="quickExportExcelBtn" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Tải Excel
+              </button>
+            </div>
             <p class="text-xs text-slate-500 mb-4">Theo dõi lũy kế các chỉ số trọng tâm của Brandshop</p>
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
@@ -354,5 +523,249 @@
   <!-- Load default data first, then app logic -->
   <script src="data/default-data.js"></script>
   <script src="assets/app.js"></script>
+
+  <!-- Module bổ sung xử lý UI Upload GCSM/Center, Cài đặt Target và Export Báo cáo -->
+  <script>
+    (function () {
+      const TARGET_STORAGE_KEY = 'oppo_tg_custom_targets_v1';
+      const DEFAULT_TARGETS = {
+        'Phone': 68,
+        'Tai Nghe': 6,
+        'Pad': 4,
+        'Ốp Lưng': 9,
+        'OPPO Care': 20,
+        'MDCL (Miếng dán)': 64,
+        'Sạc Dự Phòng': 6,
+        'Watch': 0
+      };
+
+      // --- 1. ĐIỀU KHIỂN MODAL & DROPDOWN ---
+      const uploadModal = document.getElementById('uploadModal');
+      const targetModal = document.getElementById('targetModal');
+      const exportMenuBtn = document.getElementById('exportMenuBtn');
+      const exportDropdownMenu = document.getElementById('exportDropdownMenu');
+
+      document.getElementById('openUploadModalBtn')?.addEventListener('click', () => {
+        uploadModal.classList.remove('hidden');
+        uploadModal.classList.add('flex');
+      });
+      ['closeUploadModalBtn', 'doneUploadModalBtn'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', () => {
+          uploadModal.classList.add('hidden');
+          uploadModal.classList.remove('flex');
+        });
+      });
+
+      document.getElementById('openTargetModalBtn')?.addEventListener('click', () => {
+        renderTargetInputs();
+        targetModal.classList.remove('hidden');
+        targetModal.classList.add('flex');
+      });
+      ['closeTargetModalBtn', 'cancelTargetModalBtn'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', () => {
+          targetModal.classList.add('hidden');
+          targetModal.classList.remove('flex');
+        });
+      });
+
+      exportMenuBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportDropdownMenu.classList.toggle('hidden');
+      });
+      document.addEventListener('click', () => {
+        exportDropdownMenu?.classList.add('hidden');
+      });
+
+      // --- 2. XỬ LÝ UPLOAD RIÊNG FILE GCSM & CENTER ---
+      function parseWorkbookFile(file, sourceType) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            const data = new Uint8Array(evt.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+            // Lưu dữ liệu nguồn riêng vào localStorage để app.js hoặc hàm hợp nhất đọc
+            const storageKey = sourceType === 'GCSM' ? 'oppo_tg_gcsm_raw' : 'oppo_tg_center_raw';
+            localStorage.setItem(storageKey, JSON.stringify({
+              fileName: file.name,
+              updatedAt: new Date().toLocaleString('vi-VN'),
+              rowCount: rows.length,
+              rows: rows
+            }));
+
+            // Cập nhật trạng thái trên Modal
+            const statusEl = document.getElementById(sourceType === 'GCSM' ? 'gcsmFileStatus' : 'centerFileStatus');
+            if (statusEl) {
+              statusEl.textContent = `Đã nạp (${rows.length} dòng)`;
+              statusEl.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700';
+            }
+
+            // Nếu app.js có hàm xử lý riêng thì gọi, nếu không thì phát sự kiện custom để app đồng bộ
+            window.dispatchEvent(new CustomEvent('oppoSourceUploaded', {
+              detail: { source: sourceType, fileName: file.name, rows, workbook }
+            }));
+
+            showLocalToast(`Đã tải lên dữ liệu ${sourceType}: ${file.name} (${rows.length} dòng)`, 'success');
+          } catch (err) {
+            console.error(err);
+            showLocalToast(`Lỗi đọc file ${sourceType}: ${err.message}`, 'error');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      document.getElementById('gcsmUploadInput')?.addEventListener('change', (e) => {
+        parseWorkbookFile(e.target.files[0], 'GCSM');
+      });
+      document.getElementById('centerUploadInput')?.addEventListener('change', (e) => {
+        parseWorkbookFile(e.target.files[0], 'CENTER');
+      });
+
+      // --- 3. QUẢN LÝ & THAY ĐỔI TARGET ---
+      function getSavedTargets() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(TARGET_STORAGE_KEY) || 'null');
+          return saved ? { ...DEFAULT_TARGETS, ...saved } : { ...DEFAULT_TARGETS };
+        } catch {
+          return { ...DEFAULT_TARGETS };
+        }
+      }
+
+      function renderTargetInputs() {
+        const targets = getSavedTargets();
+        const container = document.getElementById('targetInputsGrid');
+        if (!container) return;
+
+        container.innerHTML = Object.entries(targets).map(([cat, val]) => `
+          <div class="p-3 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3">
+            <label class="text-xs font-semibold text-slate-700">${cat}</label>
+            <input type="number" min="0" step="1" data-target-cat="${cat}" value="${val}"
+              class="target-input w-24 px-2.5 py-1.5 rounded-lg border border-slate-300 text-right text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        `).join('');
+
+        updateTotalTargetPreview();
+        container.querySelectorAll('.target-input').forEach(inp => {
+          inp.addEventListener('input', updateTotalTargetPreview);
+        });
+      }
+
+      function updateTotalTargetPreview() {
+        let sum = 0;
+        document.querySelectorAll('.target-input').forEach(inp => {
+          sum += Number(inp.value) || 0;
+        });
+        const preview = document.getElementById('totalTargetPreview');
+        if (preview) preview.textContent = `${sum} điểm`;
+      }
+
+      document.getElementById('saveTargetBtn')?.addEventListener('click', () => {
+        const newTargets = {};
+        document.querySelectorAll('.target-input').forEach(inp => {
+          newTargets[inp.dataset.targetCat] = Number(inp.value) || 0;
+        });
+        localStorage.setItem(TARGET_STORAGE_KEY, JSON.stringify(newTargets));
+        window.OPPO_CUSTOM_TARGETS = newTargets;
+
+        // Kích hoạt sự kiện cập nhật lại giao diện nếu app.js lắng nghe, hoặc tải lại trạng thái
+        window.dispatchEvent(new CustomEvent('oppoTargetsUpdated', { detail: newTargets }));
+        targetModal.classList.add('hidden');
+        targetModal.classList.remove('flex');
+        showLocalToast('Đã lưu Target mới! Đang cập nhật lại tỷ lệ KPI...', 'success');
+
+        // Nếu app.js chưa tự bắt sự kiện, reload nhẹ để áp dụng target từ LocalStorage
+        setTimeout(() => {
+          if (typeof window.renderDashboard === 'function') {
+            window.renderDashboard();
+          } else {
+            location.reload();
+          }
+        }, 400);
+      });
+
+      document.getElementById('resetDefaultTargetBtn')?.addEventListener('click', () => {
+        localStorage.removeItem(TARGET_STORAGE_KEY);
+        renderTargetInputs();
+        showLocalToast('Đã đưa các ô nhập về Target mặc định', 'info');
+      });
+
+      // Khởi tạo sẵn biến toàn cục để app.js có thể đọc ngay khi load trang
+      window.OPPO_CUSTOM_TARGETS = getSavedTargets();
+
+      // --- 4. EXPORT BÁO CÁO EXCEL (.XLSX) & IN PDF ---
+      function exportFullExcelReport() {
+        try {
+          const wb = XLSX.utils.book_new();
+
+          // Sheet 1: Tổng hợp KPI theo nhóm hàng (đọc trực tiếp từ giao diện hiện tại)
+          const kpiRows = [['Nhóm Hàng / Chỉ Tiêu', 'Thực Đạt', 'Target', '% Hoàn Thành']];
+          document.querySelectorAll('#categoryProgressGrid > div').forEach(card => {
+            const text = card.innerText.split('
+').map(s => s.trim()).filter(Boolean);
+            if (text.length >= 2) {
+              kpiRows.push([text[0], text[2] || '', text[3] || '', text[1] || '']);
+            }
+          });
+          const wsKpi = XLSX.utils.aoa_to_sheet(kpiRows);
+          XLSX.utils.book_append_sheet(wb, wsKpi, 'Tong_Hop_KPI');
+
+          // Sheet 2: Bảng đánh giá chỉ tiêu tháng
+          const reportTable = document.querySelector('#kpiReportTableBody')?.closest('table');
+          if (reportTable) {
+            const wsTable = XLSX.utils.table_to_sheet(reportTable);
+            XLSX.utils.book_append_sheet(wb, wsTable, 'Danh_Gia_Chi_Tieu');
+          }
+
+          // Sheet 3: Năng suất nhân viên
+          const staffTable = document.querySelector('#staffTableBody')?.closest('table');
+          if (staffTable) {
+            const wsStaff = XLSX.utils.table_to_sheet(staffTable);
+            XLSX.utils.book_append_sheet(wb, wsStaff, 'Nang_Suat_Nhan_Vien');
+          }
+
+          // Sheet 4: Chi tiết đơn hàng
+          const txTable = document.querySelector('#txTableBody')?.closest('table');
+          if (txTable) {
+            const wsTx = XLSX.utils.table_to_sheet(txTable);
+            XLSX.utils.book_append_sheet(wb, wsTx, 'Chi_Tiet_Don_Hang');
+          }
+
+          const dateStr = new Date().toISOString().slice(0, 10);
+          XLSX.writeFile(wb, `Bao_Cao_OPPO_Service_Store_TG_${dateStr}.xlsx`);
+          showLocalToast('Đã xuất file Excel báo cáo thành công!', 'success');
+        } catch (err) {
+          console.error(err);
+          showLocalToast('Không thể xuất Excel: ' + err.message, 'error');
+        }
+      }
+
+      document.getElementById('exportExcelReportBtn')?.addEventListener('click', exportFullExcelReport);
+      document.getElementById('quickExportExcelBtn')?.addEventListener('click', exportFullExcelReport);
+      document.getElementById('exportPrintReportBtn')?.addEventListener('click', () => {
+        window.print();
+      });
+
+      function showLocalToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const colors = {
+          success: 'bg-emerald-700 text-white',
+          error: 'bg-rose-600 text-white',
+          info: 'bg-slate-800 text-white'
+        };
+        const toast = document.createElement('div');
+        toast.className = `${colors[type] || colors.info} px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transition-opacity duration-300`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 3200);
+      }
+    })();
+  </script>
 </body>
 </html>
